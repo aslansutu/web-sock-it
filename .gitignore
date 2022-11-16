@@ -130,3 +130,5 @@ dmypy.json
 
 # SSL Cert
 *.pem
+
+client/package-lock.json

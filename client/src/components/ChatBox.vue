@@ -1,6 +1,6 @@
 <template>
     <h1>WebSocket Chat</h1>
-    <h2>Your ID: <span id="ws-id"></span></h2>
+    <h2>Your ID: {{ client_id }}</h2>
     <form action="" onsubmit="sendMessage(event)">
         <input type="text" id="messageText" autocomplete="off"/>
         <button>Send</button>
@@ -11,25 +11,30 @@
 
 
 <script>
+const host = 'localhost'
+const port = '8000' 
+const wsurl = (client_id) => 'wss://' + host + ':' + port + '/ws/' + client_id
+
 export default{
-    mounted () {
-        var client_id = Date.now()
-        document.querySelector("#ws-id").textContent = client_id;
-        var ws = new WebSocket(`wss://localhost:8000/ws/${client_id}`);
-        ws.onmessage = function(event) {
-            var messages = document.getElementById('messages')
-            var message = document.createElement('li')
-            var content = document.createTextNode(event.data)
-            message.appendChild(content)
-            messages.appendChild(message)
-        };
-        function sendMessage(event) {
-            var input = document.getElementById("messageText")
-            ws.send(input.value)
-            input.value = ''
-            event.preventDefault()
+    data () {
+        return {
+            ws: null,
+            client_id: Date.now()
+        }
+    },
+    created () {
+        console.log("Starting WebSocket connection")
+        this.ws = new WebSocket (wsurl(this.client_id))
+
+        this.ws.onmessage = function (event) {
+            console.log(event)
+        }
+
+        this.ws.onopen = function(event) {
+            console.log(event)
+            console.log("Successfully connected to WebSocket")
         }
     }
 }
-    
+
 </script>
